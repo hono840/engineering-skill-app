@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# エンジニアスキル向上アプリ
 
-## Getting Started
+実践的なシステム設計スキルを身につけ、他のエンジニアからフィードバックをもらえるWebアプリケーション
 
-First, run the development server:
+## 概要
+
+このアプリケーションは、エンジニアがシステム設計スキルを向上させるためのプラットフォームです。様々なお題に対して設計図を作成し、他のユーザーからフィードバックを受けることで、実践的な設計スキルを身につけることができます。
+
+## 主な機能
+
+- 🎯 **実践的なお題**: ECサイト、SaaS、チャットアプリなど、実際のプロジェクトで求められるシステム設計のお題
+- 🎨 **直感的な設計図エディタ**: React Flowを使用したドラッグ&ドロップ式の設計図作成ツール
+- 💬 **多角的なフィードバック**: スケーラビリティ、セキュリティ、パフォーマンスなどの観点からの評価
+- 👤 **ユーザー管理**: プロフィール管理、投稿履歴、フィードバック管理
+
+## 技術スタック
+
+- **フロントエンド**: Next.js 14 (App Router), TypeScript, Tailwind CSS
+- **設計図エディタ**: React Flow
+- **バックエンド**: Supabase (PostgreSQL, Auth, REST API)
+- **デプロイ**: Vercel
+
+## セットアップ手順
+
+### 1. リポジトリのクローン
+
+```bash
+git clone [repository-url]
+cd engineering-skill-app
+```
+
+### 2. 依存関係のインストール
+
+```bash
+npm install
+```
+
+### 3. Supabaseプロジェクトのセットアップ
+
+1. [Supabase](https://supabase.com)でプロジェクトを作成
+2. `supabase_database_sql.sql`のSQLを実行してデータベースを構築
+3. 環境変数を設定
+
+### 4. 環境変数の設定
+
+`.env.local`ファイルを作成し、以下の環境変数を設定：
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 5. 開発サーバーの起動
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで `http://localhost:3000` を開きます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## プロジェクト構成
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+engineering-skill-app/
+├── app/                 # Next.js App Router
+│   ├── (auth)/         # 認証関連ページ
+│   ├── topics/         # お題関連ページ
+│   ├── editor/         # 設計図作成ページ
+│   ├── submissions/    # 投稿詳細ページ
+│   └── profile/        # プロフィールページ
+├── components/         # 再利用可能コンポーネント
+│   ├── ui/            # 基本UIコンポーネント
+│   ├── editor/        # エディタ関連コンポーネント
+│   └── layout/        # レイアウトコンポーネント
+├── lib/               # ユーティリティ・設定
+│   ├── supabase.ts    # Supabase設定
+│   ├── types.ts       # 型定義
+│   └── auth-context.tsx # 認証コンテキスト
+└── types/             # グローバル型定義
+```
 
-## Learn More
+## デプロイ
 
-To learn more about Next.js, take a look at the following resources:
+### Vercelへのデプロイ
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. [Vercel](https://vercel.com)でアカウントを作成
+2. GitHubリポジトリと連携
+3. 環境変数を設定
+4. デプロイ
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 開発ガイドライン
 
-## Deploy on Vercel
+- TypeScriptを使用し、型安全性を保つ
+- Tailwind CSSでスタイリング
+- React Flowでシステム設計図を実装
+- Supabase Row Level Securityでデータ保護
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ライセンス
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
