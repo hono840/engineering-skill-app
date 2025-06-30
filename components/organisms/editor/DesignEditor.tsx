@@ -1,23 +1,23 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import ReactFlow, {
-  Node,
-  Edge,
   addEdge,
-  Connection,
-  useNodesState,
-  useEdgesState,
   Background,
+  type Connection,
   Controls,
+  type Edge,
   MiniMap,
+  type Node,
   Panel,
+  useEdgesState,
+  useNodesState,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { Topic } from '@/lib/types'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/lib/auth-context'
+import { supabase } from '@/lib/supabase'
+import type { Topic } from '@/lib/types'
 import CustomNode from './CustomNode'
 import NodePalette from './NodePalette'
 
@@ -121,9 +121,11 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
       if (error) throw error
 
       router.push(`/submissions/${data.id}`)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving submission:', error)
-      alert('保存中にエラーが発生しました: ' + error.message)
+      alert(
+        `保存中にエラーが発生しました: ${error instanceof Error ? error.message : 'エラーが発生しました'}`
+      )
     } finally {
       setSaving(false)
     }
@@ -135,13 +137,17 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
       <div className="w-80 bg-white shadow-lg overflow-y-auto">
         <div className="p-6">
           <h2 className="text-xl font-bold mb-4">{topic.title}</h2>
-          
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="design-title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 設計タイトル *
               </label>
               <input
+                id="design-title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -151,10 +157,14 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="design-description"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 設計の説明 *
               </label>
               <textarea
+                id="design-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
@@ -164,10 +174,14 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="technical-reasoning"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 技術選定の理由
               </label>
               <textarea
+                id="technical-reasoning"
                 value={technicalReasoning}
                 onChange={(e) => setTechnicalReasoning(e.target.value)}
                 rows={3}
@@ -177,10 +191,14 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="challenges-solutions"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 課題と解決策
               </label>
               <textarea
+                id="challenges-solutions"
                 value={challengesAndSolutions}
                 onChange={(e) => setChallengesAndSolutions(e.target.value)}
                 rows={3}
@@ -191,6 +209,7 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
 
             <div className="pt-4 space-y-2">
               <button
+                type="button"
                 onClick={() => handleSave('published')}
                 disabled={saving}
                 className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
@@ -198,6 +217,7 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
                 {saving ? '保存中...' : '投稿する'}
               </button>
               <button
+                type="button"
                 onClick={() => handleSave('draft')}
                 disabled={saving}
                 className="w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 disabled:opacity-50"

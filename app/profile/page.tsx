@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useAuth } from '@/lib/auth-context'
-import { supabase } from '@/lib/supabase'
-import { Submission } from '@/lib/types'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState, useCallback } from 'react'
+import { useAuth } from '@/lib/auth-context'
+import { supabase } from '@/lib/supabase'
+import type { Submission, Feedback } from '@/lib/types'
 
 export default function ProfilePage() {
   const { user, profile, loading: authLoading } = useAuth()
@@ -18,18 +18,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/auth/login')
-      return
-    }
-
-    if (user) {
-      fetchUserData()
-    }
-  }, [user, authLoading])
-
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       // ユーザーの投稿を取得
       const { data: submissionsData, error: submissionsError } = await supabase
@@ -57,26 +46,33 @@ export default function ProfilePage() {
       let totalFeedbacks = 0
       let totalScore = 0
 
-      const submissionsWithStats = submissionsData?.map(submission => {
-        const feedbacks = submission.feedbacks || []
-        const feedbackCount = feedbacks.length
-        totalFeedbacks += feedbackCount
+      const submissionsWithStats =
+        submissionsData?.map((submission) => {
+          const feedbacks = submission.feedbacks || []
+          const feedbackCount = feedbacks.length
+          totalFeedbacks += feedbackCount
 
-        if (feedbackCount > 0) {
-          const avgScore = feedbacks.reduce((sum: number, f: any) => {
-            const score = (f.scalability_score + f.security_score + f.performance_score + 
-                          f.maintainability_score + f.design_validity_score) / 5
-            return sum + score
-          }, 0) / feedbackCount
-          totalScore += avgScore * feedbackCount
-        }
+          if (feedbackCount > 0) {
+            const avgScore =
+              feedbacks.reduce((sum: number, f: Feedback) => {
+                const score =
+                  (f.scalability_score +
+                    f.security_score +
+                    f.performance_score +
+                    f.maintainability_score +
+                    f.design_validity_score) /
+                  5
+                return sum + score
+              }, 0) / feedbackCount
+            totalScore += avgScore * feedbackCount
+          }
 
-        return {
-          ...submission,
-          topic: submission.topics,
-          feedback_count: feedbackCount
-        }
-      }) || []
+          return {
+            ...submission,
+            topic: submission.topics,
+            feedback_count: feedbackCount,
+          }
+        }) || []
 
       setSubmissions(submissionsWithStats)
 
@@ -96,7 +92,18 @@ export default function ProfilePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/auth/login')
+      return
+    }
+
+    if (user) {
+      fetchUserData()
+    }
+  }, [user, authLoading, router, fetchUserData])
 
   if (authLoading || loading) {
     return (
@@ -121,9 +128,7 @@ export default function ProfilePage() {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{profile.display_name}</h1>
                 <p className="text-gray-600">@{profile.username}</p>
-                {profile.bio && (
-                  <p className="mt-2 text-gray-700">{profile.bio}</p>
-                )}
+                {profile.bio && <p className="mt-2 text-gray-700">{profile.bio}</p>}
                 <div className="mt-2 flex gap-4">
                   {profile.github_url && (
                     <a
@@ -177,7 +182,7 @@ export default function ProfilePage() {
         {/* 投稿一覧 */}
         <div>
           <h2 className="text-xl font-semibold text-gray-900 mb-4">投稿した設計図</h2>
-          
+
           {submissions.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-8 text-center">
               <p className="text-gray-500">まだ設計図を投稿していません</p>
@@ -197,9 +202,7 @@ export default function ProfilePage() {
                   className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-6"
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {submission.title}
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{submission.title}</h3>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         submission.status === 'published'
@@ -210,11 +213,9 @@ export default function ProfilePage() {
                       {submission.status === 'published' ? '公開' : '下書き'}
                     </span>
                   </div>
-                  
-                  <p className="text-sm text-gray-600 mb-2">
-                    お題: {submission.topic?.title}
-                  </p>
-                  
+
+                  <p className="text-sm text-gray-600 mb-2">お題: {submission.topic?.title}</p>
+
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                     {submission.description}
                   </p>

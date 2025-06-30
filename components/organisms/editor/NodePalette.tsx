@@ -1,4 +1,10 @@
-const nodeTypes = [
+interface NodeType {
+  label: string
+  icon: string
+  type: string
+}
+
+const nodeTypes: NodeType[] = [
   { label: 'ユーザー', icon: '👤', type: 'user' },
   { label: 'Webサーバー', icon: '🖥️', type: 'server' },
   { label: 'APIサーバー', icon: '🔌', type: 'api' },
@@ -14,7 +20,7 @@ const nodeTypes = [
 ]
 
 export default function NodePalette() {
-  const onDragStart = (event: React.DragEvent, nodeData: any) => {
+  const onDragStart = (event: React.DragEvent, nodeData: NodeType) => {
     event.dataTransfer.setData('application/reactflow', JSON.stringify(nodeData))
     event.dataTransfer.effectAllowed = 'move'
   }
@@ -22,15 +28,16 @@ export default function NodePalette() {
   return (
     <div className="grid grid-cols-2 gap-2">
       {nodeTypes.map((node) => (
-        <div
+        <button
           key={node.type}
-          className="bg-gray-50 border border-gray-200 rounded-lg p-3 cursor-move hover:bg-gray-100 transition-colors"
+          type="button"
+          className="bg-gray-50 border border-gray-200 rounded-lg p-3 cursor-move hover:bg-gray-100 transition-colors w-full"
           draggable
           onDragStart={(e) => onDragStart(e, node)}
         >
           <div className="text-xl text-center mb-1">{node.icon}</div>
           <div className="text-xs text-center text-gray-600">{node.label}</div>
-        </div>
+        </button>
       ))}
     </div>
   )

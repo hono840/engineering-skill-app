@@ -15,7 +15,17 @@ export interface Topic {
   id: string
   title: string
   description: string
-  category: 'SaaS' | 'ECサイト' | 'チャットアプリ' | 'MaaS' | '認証システム' | '決済システム' | 'SNS' | 'ブログ' | 'タスク管理' | 'その他'
+  category:
+    | 'SaaS'
+    | 'ECサイト'
+    | 'チャットアプリ'
+    | 'MaaS'
+    | '認証システム'
+    | '決済システム'
+    | 'SNS'
+    | 'ブログ'
+    | 'タスク管理'
+    | 'その他'
   difficulty_level: 1 | 2 | 3 | 4 | 5
   estimated_time: string
   requirements: string[]
@@ -44,6 +54,7 @@ export interface Submission {
   topic?: Topic
   user?: Profile
   feedback_summary?: FeedbackSummary
+  feedback_count?: number
 }
 
 export interface Feedback {
@@ -60,6 +71,15 @@ export interface Feedback {
   created_at: string
   updated_at: string
   user?: Profile
+}
+
+export interface FeedbackData {
+  scalability_score: number
+  security_score: number
+  performance_score: number
+  maintainability_score: number
+  design_validity_score: number
+  comment: string
 }
 
 export interface FeedbackSummary {
@@ -81,6 +101,16 @@ export interface SubmissionLike {
 }
 
 export interface ReactFlowJsonObject {
-  nodes: any[]
-  edges: any[]
+  nodes: Array<{
+    id: string
+    position: { x: number; y: number }
+    data: Record<string, unknown>
+    type?: string
+  }>
+  edges: Array<{
+    id: string
+    source: string
+    target: string
+    [key: string]: unknown
+  }>
 }

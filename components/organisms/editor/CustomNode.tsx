@@ -34,9 +34,7 @@ const CustomNode = memo(({ data }: CustomNodeProps) => {
   }
 
   return (
-    <div
-      className={`px-4 py-3 rounded-lg border-2 ${getNodeStyle()} min-w-[120px] text-center`}
-    >
+    <div className={`px-4 py-3 rounded-lg border-2 ${getNodeStyle()} min-w-[120px] text-center`}>
       <Handle type="target" position={Position.Top} />
       <div className="text-2xl mb-1">{data.icon}</div>
       <div className="text-sm font-medium">{data.label}</div>

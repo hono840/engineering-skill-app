@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { Submission, Feedback } from '@/lib/types'
-import { useAuth } from '@/lib/auth-context'
+import { useEffect, useState, useCallback } from 'react'
 import ReactFlow, { Background, Controls, MiniMap } from 'reactflow'
+import { useAuth } from '@/lib/auth-context'
+import { supabase } from '@/lib/supabase'
+import type { Feedback, Submission, FeedbackData } from '@/lib/types'
 import 'reactflow/dist/style.css'
-import CustomNode from '@/components/editor/CustomNode'
-import FeedbackForm from '@/components/FeedbackForm'
-import FeedbackList from '@/components/FeedbackList'
+import CustomNode from '@/components/organisms/editor/CustomNode'
+import FeedbackForm from '@/components/organisms/FeedbackForm'
+import FeedbackList from '@/components/organisms/FeedbackList'
 
 const nodeTypes = {
   custom: CustomNode,
@@ -21,11 +21,7 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
   const [userFeedback, setUserFeedback] = useState<Feedback | null>(null)
   const { user } = useAuth()
 
-  useEffect(() => {
-    fetchSubmissionAndFeedbacks()
-  }, [params.id, user])
-
-  const fetchSubmissionAndFeedbacks = async () => {
+  const fetchSubmissionAndFeedbacks = useCallback(async () => {
     try {
       // 投稿の詳細を取得
       const { data: submissionData, error: submissionError } = await supabase
@@ -50,7 +46,7 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
       const submissionWithUser = {
         ...submissionData,
         user: submissionData.profiles,
-        topic: submissionData.topics
+        topic: submissionData.topics,
       }
 
       setSubmission(submissionWithUser)
@@ -71,16 +67,17 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
 
       if (feedbacksError) throw feedbacksError
 
-      const feedbacksWithUser = feedbacksData?.map(feedback => ({
-        ...feedback,
-        user: feedback.profiles
-      })) || []
+      const feedbacksWithUser =
+        feedbacksData?.map((feedback) => ({
+          ...feedback,
+          user: feedback.profiles,
+        })) || []
 
       setFeedbacks(feedbacksWithUser)
 
       // ログインユーザーのフィードバックを確認
       if (user) {
-        const userFeedbackData = feedbacksWithUser.find(f => f.user_id === user.id)
+        const userFeedbackData = feedbacksWithUser.find((f) => f.user_id === user.id)
         setUserFeedback(userFeedbackData || null)
       }
     } catch (error) {
@@ -88,9 +85,13 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
     } finally {
       setLoading(false)
     }
-  }
+  }, [params.id, user])
 
-  const handleFeedbackSubmit = async (feedbackData: any) => {
+  useEffect(() => {
+    fetchSubmissionAndFeedbacks()
+  }, [fetchSubmissionAndFeedbacks])
+
+  const handleFeedbackSubmit = async (feedbackData: FeedbackData) => {
     try {
       const { data, error } = await supabase
         .from('feedbacks')
@@ -113,7 +114,7 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
 
       const newFeedback = {
         ...data,
-        user: data.profiles
+        user: data.profiles,
       }
 
       setFeedbacks([newFeedback, ...feedbacks])
@@ -140,15 +141,20 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
     )
   }
 
-  const averageScores = feedbacks.length > 0
-    ? {
-        scalability: feedbacks.reduce((sum, f) => sum + f.scalability_score, 0) / feedbacks.length,
-        security: feedbacks.reduce((sum, f) => sum + f.security_score, 0) / feedbacks.length,
-        performance: feedbacks.reduce((sum, f) => sum + f.performance_score, 0) / feedbacks.length,
-        maintainability: feedbacks.reduce((sum, f) => sum + f.maintainability_score, 0) / feedbacks.length,
-        design_validity: feedbacks.reduce((sum, f) => sum + f.design_validity_score, 0) / feedbacks.length,
-      }
-    : null
+  const averageScores =
+    feedbacks.length > 0
+      ? {
+          scalability:
+            feedbacks.reduce((sum, f) => sum + f.scalability_score, 0) / feedbacks.length,
+          security: feedbacks.reduce((sum, f) => sum + f.security_score, 0) / feedbacks.length,
+          performance:
+            feedbacks.reduce((sum, f) => sum + f.performance_score, 0) / feedbacks.length,
+          maintainability:
+            feedbacks.reduce((sum, f) => sum + f.maintainability_score, 0) / feedbacks.length,
+          design_validity:
+            feedbacks.reduce((sum, f) => sum + f.design_validity_score, 0) / feedbacks.length,
+        }
+      : null
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -156,9 +162,7 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
         {/* ヘッダー */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="mb-4">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {submission.title}
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{submission.title}</h1>
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <span>お題: {submission.topic?.title}</span>
               <span>投稿者: {submission.user?.display_name}</span>
@@ -208,14 +212,18 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
             {submission.technical_reasoning && (
               <>
                 <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">技術選定の理由</h3>
-                <p className="text-gray-600 whitespace-pre-wrap">{submission.technical_reasoning}</p>
+                <p className="text-gray-600 whitespace-pre-wrap">
+                  {submission.technical_reasoning}
+                </p>
               </>
             )}
 
             {submission.challenges_and_solutions && (
               <>
                 <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-2">課題と解決策</h3>
-                <p className="text-gray-600 whitespace-pre-wrap">{submission.challenges_and_solutions}</p>
+                <p className="text-gray-600 whitespace-pre-wrap">
+                  {submission.challenges_and_solutions}
+                </p>
               </>
             )}
           </div>
@@ -253,9 +261,7 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
           <div>
             {user && !userFeedback && (
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  フィードバックを投稿
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">フィードバックを投稿</h3>
                 <FeedbackForm onSubmit={handleFeedbackSubmit} />
               </div>
             )}
@@ -270,9 +276,7 @@ export default function SubmissionDetailPage({ params }: { params: { id: string 
 
             {!user && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <p className="text-gray-600">
-                  フィードバックを投稿するにはログインが必要です
-                </p>
+                <p className="text-gray-600">フィードバックを投稿するにはログインが必要です</p>
               </div>
             )}
           </div>

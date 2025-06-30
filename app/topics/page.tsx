@@ -1,17 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { Topic } from '@/lib/types'
 import Link from 'next/link'
-import { useAuth } from '@/lib/auth-context'
+import { useEffect, useState, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
+import type { Topic } from '@/lib/types'
 
 const DIFFICULTY_LABELS = {
   1: '初級',
   2: '中級',
   3: '上級',
   4: 'エキスパート',
-  5: 'マスター'
+  5: 'マスター',
 }
 
 const DIFFICULTY_COLORS = {
@@ -19,7 +18,7 @@ const DIFFICULTY_COLORS = {
   2: 'bg-blue-100 text-blue-800',
   3: 'bg-yellow-100 text-yellow-800',
   4: 'bg-orange-100 text-orange-800',
-  5: 'bg-red-100 text-red-800'
+  5: 'bg-red-100 text-red-800',
 }
 
 export default function TopicsPage() {
@@ -27,13 +26,9 @@ export default function TopicsPage() {
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all')
-  const { user } = useAuth()
+  // const { user } = useAuth() // 現在未使用
 
-  useEffect(() => {
-    fetchTopics()
-  }, [selectedCategory, selectedDifficulty])
-
-  const fetchTopics = async () => {
+  const fetchTopics = useCallback(async () => {
     try {
       let query = supabase
         .from('topics')
@@ -52,7 +47,7 @@ export default function TopicsPage() {
       }
 
       if (selectedDifficulty !== 'all') {
-        query = query.eq('difficulty_level', parseInt(selectedDifficulty))
+        query = query.eq('difficulty_level', Number.parseInt(selectedDifficulty))
       }
 
       const { data, error } = await query
@@ -60,14 +55,15 @@ export default function TopicsPage() {
       if (error) throw error
 
       // 投稿数を集計
-      const topicsWithStats = data?.map(topic => {
-        const submissionCount = topic.submissions?.length || 0
-        const { submissions, ...topicData } = topic
-        return {
-          ...topicData,
-          submission_count: submissionCount
-        }
-      }) || []
+      const topicsWithStats =
+        data?.map((topic) => {
+          const submissionCount = topic.submissions?.length || 0
+          const { submissions: _, ...topicData } = topic
+          return {
+            ...topicData,
+            submission_count: submissionCount,
+          }
+        }) || []
 
       setTopics(topicsWithStats)
     } catch (error) {
@@ -75,7 +71,11 @@ export default function TopicsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedCategory, selectedDifficulty])
+
+  useEffect(() => {
+    fetchTopics()
+  }, [fetchTopics])
 
   if (loading) {
     return (
@@ -90,9 +90,7 @@ export default function TopicsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">システム設計のお題</h1>
-          <p className="mt-2 text-gray-600">
-            実践的なシステム設計スキルを身につけましょう
-          </p>
+          <p className="mt-2 text-gray-600">実践的なシステム設計スキルを身につけましょう</p>
         </div>
 
         {/* フィルター */}
@@ -150,9 +148,7 @@ export default function TopicsPage() {
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {topic.title}
-                  </h3>
+                  <h3 className="text-xl font-semibold text-gray-900">{topic.title}</h3>
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       DIFFICULTY_COLORS[topic.difficulty_level as keyof typeof DIFFICULTY_COLORS]
@@ -162,9 +158,7 @@ export default function TopicsPage() {
                   </span>
                 </div>
 
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {topic.description}
-                </p>
+                <p className="text-gray-600 mb-4 line-clamp-3">{topic.description}</p>
 
                 <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">

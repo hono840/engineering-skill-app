@@ -1,9 +1,9 @@
 'use client'
 
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -26,8 +26,8 @@ export default function LoginPage() {
       if (error) throw error
 
       router.push('/topics')
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'ログインに失敗しました')
     } finally {
       setLoading(false)
     }
@@ -37,9 +37,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            ログイン
-          </h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">ログイン</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             アカウントをお持ちでない方は{' '}
             <Link href="/auth/signup" className="font-medium text-indigo-600 hover:text-indigo-500">

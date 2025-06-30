@@ -7,9 +7,7 @@ export default function Home() {
       <section className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              エンジニアスキル向上アプリ
-            </h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">エンジニアスキル向上アプリ</h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
               実践的なシステム設計スキルを身につけ、
               <br />
@@ -36,33 +34,25 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            このアプリでできること
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-12">このアプリでできること</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-lg shadow-md">
               <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-xl font-semibold mb-3">
-                実践的なお題に挑戦
-              </h3>
+              <h3 className="text-xl font-semibold mb-3">実践的なお題に挑戦</h3>
               <p className="text-gray-600">
                 ECサイト、SaaS、チャットアプリなど、実際のプロジェクトで求められるシステム設計に挑戦できます。
               </p>
             </div>
             <div className="bg-white p-8 rounded-lg shadow-md">
               <div className="text-4xl mb-4">🎨</div>
-              <h3 className="text-xl font-semibold mb-3">
-                直感的な設計図作成
-              </h3>
+              <h3 className="text-xl font-semibold mb-3">直感的な設計図作成</h3>
               <p className="text-gray-600">
                 ドラッグ&ドロップで簡単にシステム構成図を作成。視覚的にわかりやすい設計図が作れます。
               </p>
             </div>
             <div className="bg-white p-8 rounded-lg shadow-md">
               <div className="text-4xl mb-4">💬</div>
-              <h3 className="text-xl font-semibold mb-3">
-                建設的なフィードバック
-              </h3>
+              <h3 className="text-xl font-semibold mb-3">建設的なフィードバック</h3>
               <p className="text-gray-600">
                 スケーラビリティ、セキュリティ、パフォーマンスなど、多角的な観点からフィードバックをもらえます。
               </p>
@@ -74,9 +64,7 @@ export default function Home() {
       {/* How it Works Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            使い方
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-12">使い方</h2>
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-indigo-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
@@ -101,9 +89,7 @@ export default function Home() {
                 3
               </div>
               <h3 className="font-semibold mb-2">投稿する</h3>
-              <p className="text-gray-600 text-sm">
-                設計の説明や技術選定の理由を添えて投稿
-              </p>
+              <p className="text-gray-600 text-sm">設計の説明や技術選定の理由を添えて投稿</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-indigo-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
@@ -121,9 +107,7 @@ export default function Home() {
       {/* CTA Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            今すぐ始めよう
-          </h2>
+          <h2 className="text-3xl font-bold mb-4">今すぐ始めよう</h2>
           <p className="text-xl text-gray-600 mb-8">
             システム設計スキルを実践的に身につけて、
             <br />

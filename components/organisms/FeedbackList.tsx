@@ -1,4 +1,4 @@
-import { Feedback } from '@/lib/types'
+import type { Feedback } from '@/lib/types'
 
 interface FeedbackListProps {
   feedbacks: Feedback[]
@@ -24,13 +24,13 @@ export default function FeedbackList({ feedbacks }: FeedbackListProps) {
   return (
     <div className="space-y-6">
       {feedbacks.map((feedback) => {
-        const totalScore = (
-          feedback.scalability_score +
-          feedback.security_score +
-          feedback.performance_score +
-          feedback.maintainability_score +
-          feedback.design_validity_score
-        ) / 5
+        const totalScore =
+          (feedback.scalability_score +
+            feedback.security_score +
+            feedback.performance_score +
+            feedback.maintainability_score +
+            feedback.design_validity_score) /
+          5
 
         return (
           <div key={feedback.id} className="bg-white rounded-lg shadow-md p-6">
@@ -38,9 +38,7 @@ export default function FeedbackList({ feedbacks }: FeedbackListProps) {
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gray-300 rounded-full mr-3" />
                 <div>
-                  <h4 className="font-medium text-gray-900">
-                    {feedback.user?.display_name}
-                  </h4>
+                  <h4 className="font-medium text-gray-900">{feedback.user?.display_name}</h4>
                   <p className="text-sm text-gray-500">
                     {new Date(feedback.created_at).toLocaleDateString('ja-JP')}
                   </p>
@@ -56,9 +54,7 @@ export default function FeedbackList({ feedbacks }: FeedbackListProps) {
               {Object.entries(scoreLabels).map(([key, label]) => (
                 <div key={key}>
                   <div className="text-gray-500">{label}</div>
-                  <div className="font-medium">
-                    {feedback[key as keyof typeof scoreLabels]}点
-                  </div>
+                  <div className="font-medium">{feedback[key as keyof typeof scoreLabels]}点</div>
                 </div>
               ))}
             </div>

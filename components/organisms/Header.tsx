@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useAuth } from '@/lib/auth-context'
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useAuth } from '@/lib/auth-context'
 
 export default function Header() {
   const { user, profile, signOut } = useAuth()
@@ -21,9 +21,7 @@ export default function Header() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold text-indigo-600">
-                エンジニアスキル向上アプリ
-              </span>
+              <span className="text-xl font-bold text-indigo-600">エンジニアスキル向上アプリ</span>
             </Link>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
@@ -47,6 +45,7 @@ export default function Header() {
             {user ? (
               <div className="relative">
                 <button
+                  type="button"
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
@@ -67,6 +66,7 @@ export default function Header() {
                         プロフィール
                       </Link>
                       <button
+                        type="button"
                         onClick={() => {
                           setIsMenuOpen(false)
                           handleSignOut()

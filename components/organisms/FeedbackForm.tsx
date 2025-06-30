@@ -26,7 +26,7 @@ export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!comment.trim()) {
       alert('コメントを入力してください')
       return
@@ -52,7 +52,7 @@ export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       {Object.entries(scoreLabels).map(([key, label]) => (
         <div key={key}>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={`score-${key}`} className="block text-sm font-medium text-gray-700 mb-1">
             {label}
           </label>
           <div className="flex items-center gap-2">
@@ -62,9 +62,7 @@ export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
                 type="button"
                 onClick={() => setScores({ ...scores, [key]: value })}
                 className={`text-2xl transition-colors ${
-                  scores[key as keyof typeof scores] >= value
-                    ? 'text-yellow-400'
-                    : 'text-gray-300'
+                  scores[key as keyof typeof scores] >= value ? 'text-yellow-400' : 'text-gray-300'
                 }`}
               >
                 ★
@@ -78,10 +76,11 @@ export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
       ))}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
           コメント *
         </label>
         <textarea
+          id="comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           rows={4}
