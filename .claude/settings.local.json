@@ -16,7 +16,8 @@
       "Bash(npx:*)",
       "Bash(npm run lint)",
       "Bash(npm run build:*)",
-      "Bash(npm run check:*)"
+      "Bash(npm run check:*)",
+      "Bash(git branch:*)"
     ],
     "deny": []
   }
