@@ -24,25 +24,35 @@ export default function SignupPage() {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            username,
+            display_name: displayName,
+          },
+        },
       })
 
       if (authError) throw authError
 
-      // プロフィール作成
+      // Supabaseからの確認メール送信を待つ
+      // ユーザーが作成されている場合、メール確認ページにリダイレクト
       if (authData.user) {
-        const { error: profileError } = await supabase.from('profiles').insert({
-          id: authData.user.id,
-          email,
-          username,
-          display_name: displayName,
-        })
-
-        if (profileError) throw profileError
+        // メール確認ページに移動（メールアドレスをパラメータとして渡す）
+        router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`)
       }
-
-      router.push('/topics')
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : '登録に失敗しました')
+      // エラーが発生した場合でも、実際にはメールが送信されている可能性がある
+      // そのため、メール確認ページにリダイレクトする
+      console.error('Signup error:', error)
+      const errorMessage = error instanceof Error ? error.message : '登録に失敗しました'
+
+      // 特定のエラー（例：既存ユーザー）以外はメール確認ページに移動
+      if (errorMessage.includes('User already registered')) {
+        setError('このメールアドレスは既に登録されています。ログインしてください。')
+      } else {
+        // その他のエラーでも、メールが送信されている可能性があるため確認ページに移動
+        router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`)
+      }
     } finally {
       setLoading(false)
     }

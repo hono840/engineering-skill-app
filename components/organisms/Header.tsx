@@ -3,16 +3,36 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { ConfirmDialog } from '@/components/molecules/ConfirmDialog'
 import { useAuth } from '@/lib/auth-context'
 
 export default function Header() {
   const { user, profile, signOut } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const router = useRouter()
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const _router = useRouter()
 
-  const handleSignOut = async () => {
-    await signOut()
-    router.push('/')
+  const handleSignOutClick = () => {
+    setIsMenuOpen(false)
+    setIsLogoutConfirmOpen(true)
+  }
+
+  const handleSignOutConfirm = async () => {
+    setIsLoggingOut(true)
+    try {
+      await signOut()
+      setIsLogoutConfirmOpen(false)
+      // ログアウト完了モーダルが表示されるため、ここでのリダイレクトは不要
+    } catch (error) {
+      console.error('ログアウト処理でエラーが発生しました:', error)
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
+  const handleSignOutCancel = () => {
+    setIsLogoutConfirmOpen(false)
   }
 
   return (
@@ -67,10 +87,7 @@ export default function Header() {
                       </Link>
                       <button
                         type="button"
-                        onClick={() => {
-                          setIsMenuOpen(false)
-                          handleSignOut()
-                        }}
+                        onClick={handleSignOutClick}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
                         ログアウト
@@ -98,6 +115,19 @@ export default function Header() {
           </div>
         </div>
       </nav>
+
+      {/* ログアウト確認モーダル */}
+      <ConfirmDialog
+        isOpen={isLogoutConfirmOpen}
+        onClose={handleSignOutCancel}
+        onConfirm={handleSignOutConfirm}
+        title="ログアウトの確認"
+        message="ログアウトしますか？"
+        confirmText="はい"
+        cancelText="いいえ"
+        confirmStyle="danger"
+        loading={isLoggingOut}
+      />
     </header>
   )
 }
