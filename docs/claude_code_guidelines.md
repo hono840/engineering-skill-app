@@ -4,6 +4,255 @@
 
 このドキュメントは、Claude Codeに効果的にコーディングを依頼するための指示書です。一貫した品質と完全性を確保するため、以下のガイドラインに従ってください。
 
+## 作業開始前の必須手順
+
+### 📥 最新コード取得（作業開始時に必ず実行）
+
+**すべての作業開始前に必ず実行すること:**
+
+```bash
+# 1. 最新のmainブランチを取得
+git checkout main
+git pull origin main
+
+# 2. 依存関係の更新確認
+npm install
+
+# 3. 現在の状態確認
+npm run lint
+npm run type-check
+npm run test
+npm run build
+```
+
+**⚠️ 重要: この手順を飛ばすと古いコードベースで作業することになり、競合やバグの原因となります。**
+
+## 日本語コミュニケーション規則
+
+### 📝 コメント・ドキュメント記述規則
+
+**すべてのコメントは日本語で記述すること:**
+
+```typescript
+// ✅ 良い例
+/**
+ * ユーザーの投稿データを取得する関数
+ * @param userId - 取得対象のユーザーID
+ * @returns Promise<Submission[]> - ユーザーの投稿一覧
+ * @throws {Error} - ユーザーが見つからない場合
+ */
+const getUserSubmissions = async (userId: string): Promise<Submission[]> => {
+  // APIエンドポイントの構築
+  const url = `/api/submissions?user_id=${userId}`;
+  
+  try {
+    // データ取得処理
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      // エラーレスポンスの場合は例外をスロー
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    // ネットワークエラーまたはパースエラーの処理
+    console.error('投稿データの取得に失敗しました:', error);
+    throw error;
+  }
+};
+
+// ❌ 悪い例
+// Get user submissions
+const getUserSubmissions = async (userId: string) => {
+  // Build endpoint
+  const url = `/api/submissions?user_id=${userId}`;
+  // ...
+};
+```
+
+**TODOコメントの書き方:**
+```typescript
+// TODO: パフォーマンス改善 - キャッシュ機能の実装を検討
+// FIXME: エラーハンドリングが不十分 - 具体的なエラーメッセージを追加
+// HACK: 一時的な回避策 - 正式なAPIが完成したら削除予定
+```
+
+### 🔧 Git関連の日本語規則
+
+**コミットメッセージ:**
+```bash
+# ✅ 良い例
+git commit -m "feat: ユーザープロフィール編集機能を追加
+
+- プロフィール情報の表示と編集フォームを実装
+- バリデーション機能を追加
+- 画像アップロード機能を実装
+- 対応するテストケースを作成"
+
+git commit -m "fix: 設計図エディタの保存時にエラーが発生する問題を修正
+
+- React Flowのデータ形式検証を追加
+- 空のノードデータに対する例外処理を実装
+- 関連するテストケースを更新"
+
+# ❌ 悪い例
+git commit -m "add profile edit"
+git commit -m "fix editor bug"
+```
+
+**ブランチ名:**
+```bash
+# ✅ 良い例
+git checkout -b feature/user-profile-edit
+git checkout -b fix/editor-save-error
+git checkout -b refactor/topic-card-component
+
+# ❌ 悪い例
+git checkout -b profile
+git checkout -b bug-fix
+```
+
+### 📋 Issue作成時の日本語テンプレート
+
+**新機能Issue:**
+```markdown
+## 機能概要
+[実装したい機能の概要を日本語で説明]
+
+## 背景・目的
+なぜこの機能が必要なのかを説明
+
+## 詳細仕様
+### 画面・UI要件
+- [ ] 項目1の説明
+- [ ] 項目2の説明
+
+### 機能要件
+- [ ] 機能1の詳細
+- [ ] 機能2の詳細
+
+### 技術要件
+- [ ] 使用する技術・ライブラリ
+- [ ] パフォーマンス要件
+- [ ] セキュリティ要件
+
+## 受け入れ基準
+- [ ] 基準1
+- [ ] 基準2
+
+## 実装時の注意点
+- 注意点1
+- 注意点2
+
+## 関連Issue・PR
+- 関連するIssue番号やPR番号
+```
+
+**バグ報告Issue:**
+```markdown
+## バグの概要
+[発生している問題を日本語で簡潔に説明]
+
+## 再現手順
+1. 手順1
+2. 手順2
+3. 手順3
+
+## 期待する動作
+[本来どのような動作をするべきか]
+
+## 実際の動作
+[現在発生している問題の詳細]
+
+## 環境情報
+- OS: 
+- ブラウザ: 
+- Node.js バージョン:
+- その他関連する環境情報
+
+## エラーログ・スクリーンショット
+```console
+[エラーログがあれば記載]
+```
+
+## 影響範囲
+- [ ] 機能Aに影響
+- [ ] 機能Bに影響
+
+## 優先度
+- [ ] 緊急 (サービス停止レベル)
+- [ ] 高 (主要機能に影響)
+- [ ] 中 (一部機能に影響)
+- [ ] 低 (改善要望レベル)
+```
+
+### 🔄 PR作成時の日本語テンプレート
+
+```markdown
+## 変更内容
+[実装・修正した内容を日本語で説明]
+
+## 関連Issue
+- Closes #[Issue番号]
+- Related to #[Issue番号]
+
+## 変更種別
+- [ ] 新機能 (feature)
+- [ ] バグ修正 (bugfix)
+- [ ] リファクタリング (refactor)
+- [ ] ドキュメント更新 (docs)
+- [ ] スタイル修正 (style)
+- [ ] テスト追加・修正 (test)
+- [ ] 設定変更 (chore)
+
+## 詳細説明
+### 実装内容
+- 実装した機能1の詳細
+- 実装した機能2の詳細
+
+### 技術的な変更点
+- 使用した技術・ライブラリ
+- アーキテクチャ的な変更
+- パフォーマンスへの影響
+
+## テスト
+### 追加したテスト
+- [ ] テストケース1
+- [ ] テストケース2
+
+### 実行結果
+```bash
+npm run lint     # ✅ エラー0件
+npm run type-check # ✅ エラー0件  
+npm run test     # ✅ すべてPASS
+npm run build    # ✅ 成功
+```
+
+## 動作確認
+### 確認項目
+- [ ] 確認項目1
+- [ ] 確認項目2
+
+### スクリーンショット・デモ
+[必要に応じて画像や動画を添付]
+
+## レビュー観点
+- レビューしてほしいポイント1
+- レビューしてほしいポイント2
+
+## 破壊的変更
+- [ ] 破壊的変更あり
+- [ ] 破壊的変更なし
+
+### 破壊的変更の詳細 (該当する場合)
+[APIの変更、設定ファイルの変更など]
+
+## デプロイ時の注意点
+- 注意点1
+- 注意点2
+```
+
 ## 必須チェック項目
 
 ### 🔍 コード品質チェック
@@ -38,6 +287,10 @@ npm run build
 ### 新機能開発時
 
 ```
+【作業開始】
+まず以下を実行してください:
+git checkout main && git pull origin main && npm install
+
 【依頼内容】
 [具体的な機能の説明]
 
@@ -46,6 +299,8 @@ npm run build
 2. 対応するテストコードの作成
 3. Biome lintルールの完全遵守
 4. エラーハンドリングの実装
+5. すべてのコメントを日本語で記述
+6. 適切なJSDocコメントの追加
 
 【完了チェック】
 以下をすべて実行し、エラー0件で完了すること:
@@ -56,14 +311,20 @@ npm run build
 
 【レポート要求】
 完了時に以下を報告すること:
+- git status の結果
 - 作成・変更したファイル一覧
 - 追加したテスト内容
+- コメント・JSDocの記述状況
 - Lint/型チェック/テスト/ビルドの実行結果
 ```
 
 ### バグ修正時
 
 ```
+【作業開始】
+まず以下を実行してください:
+git checkout main && git pull origin main && npm install
+
 【修正内容】
 [バグの詳細説明]
 
@@ -80,6 +341,7 @@ npm run build
 - npm run build (成功)
 
 【レポート要求】
+- git status の結果
 - 修正内容の詳細
 - 追加したテストの説明
 - 実行結果のスクリーンショット
@@ -88,6 +350,10 @@ npm run build
 ### Lintエラー修正時
 
 ```
+【作業開始】
+まず以下を実行してください:
+git checkout main && git pull origin main && npm install
+
 【修正指示】
 現在のLintエラーをすべて修正してください。
 
@@ -106,6 +372,7 @@ npm run build
 5. npm run build
 
 【必須報告事項】
+- git status の結果
 - 修正したエラーの種類と件数
 - 各コマンドの実行結果（すべて成功していること）
 - disable コメントを使用した場合はその理由
@@ -234,6 +501,9 @@ npm run build
 ### 良い依頼例
 
 ```
+【作業開始】
+git checkout main && git pull origin main && npm install
+
 新規コンポーネント「TopicCard」を作成してください。
 
 【機能】
@@ -244,6 +514,7 @@ npm run build
 - TypeScript interface定義
 - Tailwind CSSでスタイリング
 - React Testing Libraryでテスト
+- 日本語でのコメント・JSDoc記述
 - Storybookでドキュメント（任意）
 
 【ファイル構成】
@@ -253,6 +524,11 @@ npm run build
 
 【完了確認】
 すべてのチェックコマンドがエラー0件で通ること
+
+【レポート要求】
+- git status の結果
+- コメント・JSDocの記述内容
+- 実行結果の詳細
 ```
 
 ### 悪い依頼例
@@ -265,11 +541,17 @@ TopicCardを作って
 
 開発完了前に以下を確認:
 
+**Git状態確認:**
+- [ ] 最新mainブランチから作業開始
+- [ ] 変更ファイルが意図したもののみ
+- [ ] git status で確認済み
+
 **コード品質:**
 - [ ] TypeScript型定義が適切
 - [ ] Lintルール準拠
 - [ ] 命名規則準拠
-- [ ] コメント適切
+- [ ] 日本語コメント・JSDoc適切
+- [ ] 分かりやすい変数・関数名
 
 **テスト:**
 - [ ] 単体テストカバレッジ十分
