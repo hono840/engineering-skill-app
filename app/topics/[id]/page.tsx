@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
-import type { Submission, Topic, Feedback } from '@/lib/types'
+import type { Feedback, Submission, Topic } from '@/lib/types'
 
 const DIFFICULTY_LABELS = {
   1: '初級',

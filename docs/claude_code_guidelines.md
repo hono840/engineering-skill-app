@@ -262,7 +262,6 @@ npm run build    # ✅ 成功
 ```bash
 # 1. Lintチェックと自動修正
 npm run lint
-npm run lint:fix
 
 # 2. 型チェック
 npm run type-check
@@ -304,7 +303,7 @@ git checkout main && git pull origin main && npm install
 
 【完了チェック】
 以下をすべて実行し、エラー0件で完了すること:
-- npm run lint && npm run lint:fix
+- npm run lint
 - npm run type-check
 - npm run test
 - npm run build
@@ -335,7 +334,7 @@ git checkout main && git pull origin main && npm install
 4. リグレッション防止策
 
 【完了チェック】
-- npm run lint && npm run lint:fix (エラー0件)
+- npm run lint
 - npm run type-check (エラー0件)
 - npm run test (すべてPASS、新規テスト含む)
 - npm run build (成功)
@@ -359,17 +358,15 @@ git checkout main && git pull origin main && npm install
 
 【修正方針】
 1. 一つずつエラーを確認し、適切に修正
-2. 自動修正可能なものは npm run lint:fix を使用
-3. 手動修正が必要なものは、コードの意図を保ちながら修正
-4. どうしても修正困難な場合のみ、理由とともにdisableコメントを使用
+2. 手動修正が必要なものは、コードの意図を保ちながら修正
+3. どうしても修正困難な場合のみ、理由とともにdisableコメントを使用
 
 【完全修正の確認】
 以下を順次実行し、すべてクリアするまで継続:
-1. npm run lint:fix
-2. npm run lint
-3. npm run type-check
-4. npm run test
-5. npm run build
+1. npm run lint
+2. npm run type-check
+3. npm run test
+4. npm run build
 
 【必須報告事項】
 - git status の結果
@@ -440,7 +437,6 @@ app/page.tsx
     "build": "next build",
     "start": "next start",
     "lint": "biome check .",
-    "lint:fix": "biome check --apply .",
     "type-check": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -455,16 +451,13 @@ app/page.tsx
 
 **対処法:**
 ```bash
-# 1. 自動修正を試す
-npm run lint:fix
-
-# 2. 残りのエラーを確認
+# 1. 残りのエラーを確認
 npm run lint
 
-# 3. 一つずつ手動修正
+# 2. 一つずつ手動修正
 # ファイル名とエラー内容を確認し、適切に修正
 
-# 4. 修正後再確認
+# 3. 修正後再確認
 npm run lint
 ```
 

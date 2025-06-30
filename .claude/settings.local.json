@@ -20,7 +20,12 @@
       "Bash(git branch:*)",
       "Bash(gh issue create:*)",
       "Bash(gh issue list:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh issue view:*)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": []
   }
