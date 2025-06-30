@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Topic } from '@/lib/types'
 
@@ -30,17 +30,12 @@ export default function TopicsPage() {
 
   const fetchTopics = useCallback(async () => {
     try {
+      console.log('Fetching topics...', { selectedCategory, selectedDifficulty })
+      
+      // topics_with_statsビューを使用してお題と統計情報を取得
       let query = supabase
-        .from('topics')
-        .select(`
-          *,
-          submissions!inner(
-            id,
-            status
-          )
-        `)
-        .eq('is_active', true)
-        .eq('submissions.status', 'published')
+        .from('topics_with_stats')
+        .select('*')
 
       if (selectedCategory !== 'all') {
         query = query.eq('category', selectedCategory)
@@ -50,24 +45,52 @@ export default function TopicsPage() {
         query = query.eq('difficulty_level', Number.parseInt(selectedDifficulty))
       }
 
-      const { data, error } = await query
+      const { data, error } = await query.order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
 
-      // 投稿数を集計
-      const topicsWithStats =
-        data?.map((topic) => {
-          const submissionCount = topic.submissions?.length || 0
-          const { submissions: _, ...topicData } = topic
-          return {
-            ...topicData,
-            submission_count: submissionCount,
-          }
-        }) || []
-
-      setTopics(topicsWithStats)
+      console.log('Topics fetched:', data?.length || 0, 'topics')
+      console.log('Topics data:', data)
+      
+      setTopics(data || [])
     } catch (error) {
       console.error('Error fetching topics:', error)
+      // フォールバックとして基本のtopicsテーブルから取得を試みる
+      try {
+        console.log('Falling back to basic topics table...')
+        let fallbackQuery = supabase
+          .from('topics')
+          .select('*')
+          .eq('is_active', true)
+
+        if (selectedCategory !== 'all') {
+          fallbackQuery = fallbackQuery.eq('category', selectedCategory)
+        }
+
+        if (selectedDifficulty !== 'all') {
+          fallbackQuery = fallbackQuery.eq('difficulty_level', Number.parseInt(selectedDifficulty))
+        }
+
+        const { data: fallbackData, error: fallbackError } = await fallbackQuery.order('created_at', { ascending: false })
+
+        if (fallbackError) {
+          console.error('Fallback query error:', fallbackError)
+        } else {
+          console.log('Fallback topics fetched:', fallbackData?.length || 0, 'topics')
+          // submission_countフィールドを0で初期化
+          const topicsWithCounts = (fallbackData || []).map(topic => ({
+            ...topic,
+            submission_count: 0,
+            average_rating: 0
+          }))
+          setTopics(topicsWithCounts)
+        }
+      } catch (fallbackError) {
+        console.error('Fallback fetch failed:', fallbackError)
+      }
     } finally {
       setLoading(false)
     }
