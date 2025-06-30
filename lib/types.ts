@@ -55,6 +55,19 @@ export interface Submission {
   user?: Profile
   feedback_summary?: FeedbackSummary
   feedback_count?: number
+  // Fields from submissions_with_stats view
+  topic_title?: string
+  topic_category?: string
+  username?: string
+  display_name?: string
+  avatar_url?: string
+  avg_scalability?: number
+  avg_security?: number
+  avg_performance?: number
+  avg_maintainability?: number
+  avg_design_validity?: number
+  total_average?: number
+  actual_like_count?: number
 }
 
 export interface Feedback {

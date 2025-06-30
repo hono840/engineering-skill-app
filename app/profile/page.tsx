@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
-import type { Submission, Feedback } from '@/lib/types'
+import type { Submission } from '@/lib/types'
 
 export default function ProfilePage() {
   const { user, profile, loading: authLoading } = useAuth()
@@ -16,79 +16,55 @@ export default function ProfilePage() {
     averageRating: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   const fetchUserData = useCallback(async () => {
     try {
-      // ユーザーの投稿を取得
+      setError(null)
+      console.log('Fetching user data for user:', user?.id)
+      
+      // 投稿データを統計情報と共に取得
       const { data: submissionsData, error: submissionsError } = await supabase
-        .from('submissions')
-        .select(`
-          *,
-          topics!topic_id (
-            title,
-            category
-          ),
-          feedbacks (
-            scalability_score,
-            security_score,
-            performance_score,
-            maintainability_score,
-            design_validity_score
-          )
-        `)
+        .from('submissions_with_stats')
+        .select('*')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false })
 
-      if (submissionsError) throw submissionsError
+      console.log('Submissions data:', submissionsData)
+      console.log('Submissions error:', submissionsError)
 
-      // 統計情報を計算
-      let totalFeedbacks = 0
-      let totalScore = 0
+      if (submissionsError) {
+        console.error('Submissions error details:', submissionsError)
+        throw submissionsError
+      }
 
-      const submissionsWithStats =
-        submissionsData?.map((submission) => {
-          const feedbacks = submission.feedbacks || []
-          const feedbackCount = feedbacks.length
-          totalFeedbacks += feedbackCount
-
-          if (feedbackCount > 0) {
-            const avgScore =
-              feedbacks.reduce((sum: number, f: Feedback) => {
-                const score =
-                  (f.scalability_score +
-                    f.security_score +
-                    f.performance_score +
-                    f.maintainability_score +
-                    f.design_validity_score) /
-                  5
-                return sum + score
-              }, 0) / feedbackCount
-            totalScore += avgScore * feedbackCount
-          }
-
-          return {
-            ...submission,
-            topic: submission.topics,
-            feedback_count: feedbackCount,
-          }
-        }) || []
-
-      setSubmissions(submissionsWithStats)
+      // 投稿データをそのまま設定
+      setSubmissions(submissionsData || [])
 
       // ユーザーが投稿したフィードバック数を取得
-      const { count: feedbackCount } = await supabase
+      const { count: feedbackCount, error: feedbackError } = await supabase
         .from('feedbacks')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user?.id)
 
+      console.log('Feedback count:', feedbackCount)
+      console.log('Feedback error:', feedbackError)
+
+      if (feedbackError) {
+        console.error('Feedback error details:', feedbackError)
+        // フィードバック取得エラーは非致命的なので警告のみ
+        console.warn('Could not fetch feedback count, using 0')
+      }
+
       setStats({
-        submissionCount: submissionsWithStats.length,
+        submissionCount: submissionsData?.length || 0,
         feedbackCount: feedbackCount || 0,
-        averageRating: totalFeedbacks > 0 ? totalScore / totalFeedbacks : 0,
+        averageRating: 0, // 一時的に0に設定
       })
     } catch (error) {
       console.error('Error fetching user data:', error)
+      setError(error instanceof Error ? error.message : 'データの取得に失敗しました')
     } finally {
       setLoading(false)
     }
@@ -114,7 +90,38 @@ export default function ProfilePage() {
   }
 
   if (!profile) {
-    return null
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-lg">プロフィールが見つかりません</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full text-center">
+          <div className="text-red-600 mb-4">
+            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-label="エラーアイコン">
+              <title>エラーアイコン</title>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.96-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">データの読み込みに失敗しました</h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            type="button"
+            onClick={() => {
+              setError(null)
+              fetchUserData()
+            }}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            再試行
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -153,12 +160,6 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-            <Link
-              href="/profile/edit"
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-            >
-              プロフィール編集
-            </Link>
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200 grid grid-cols-3 gap-4 text-center">
@@ -214,7 +215,7 @@ export default function ProfilePage() {
                     </span>
                   </div>
 
-                  <p className="text-sm text-gray-600 mb-2">お題: {submission.topic?.title}</p>
+                  <p className="text-sm text-gray-600 mb-2">お題: {submission.topic_title}</p>
 
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                     {submission.description}

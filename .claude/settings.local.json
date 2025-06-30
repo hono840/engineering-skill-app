@@ -16,7 +16,10 @@
       "Bash(npx:*)",
       "Bash(npm run lint)",
       "Bash(npm run build:*)",
-      "Bash(npm run check:*)"
+      "Bash(npm run check:*)",
+      "Bash(gh issue create:*)",
+      "Bash(gh issue list:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": []
   }
