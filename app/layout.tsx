@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import Header from '@/components/organisms/Header'
+import { LogoutSuccessModal } from '@/components/organisms/LogoutSuccessModal'
 import { AuthProvider } from '@/lib/auth-context'
 
 const geistSans = localFont({
@@ -31,6 +32,7 @@ export default function RootLayout({
         <AuthProvider>
           <Header />
           <main>{children}</main>
+          <LogoutSuccessModal />
         </AuthProvider>
       </body>
     </html>
