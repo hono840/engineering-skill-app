@@ -6,6 +6,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
 import type { Submission } from '@/lib/types'
+import { DeleteAccountDialog } from '@/components/molecules/DeleteAccountDialog'
+import { Button } from '@/components/atoms/Button'
+import { performAccountDeletion, getAccountDeletionPreview } from '@/lib/account-deletion'
 
 export default function ProfilePage() {
   const { user, profile, loading: authLoading } = useAuth()
@@ -17,6 +20,13 @@ export default function ProfilePage() {
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deletionPreview, setDeletionPreview] = useState({
+    submissionCount: 0,
+    feedbackCount: 0,
+    likeCount: 0,
+  })
   const router = useRouter()
 
   const fetchUserData = useCallback(async () => {
@@ -69,6 +79,34 @@ export default function ProfilePage() {
       setLoading(false)
     }
   }, [user])
+
+  const handleDeleteAccount = async () => {
+    if (!user || !profile) return
+
+    // 削除前データ確認
+    const preview = await getAccountDeletionPreview(user.id)
+    setDeletionPreview(preview)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDeletion = async (password: string) => {
+    if (!user || !profile) return
+
+    try {
+      setIsDeleting(true)
+      await performAccountDeletion(profile.email, password, user.id)
+      
+      // 削除成功後、ログアウトしてホームページにリダイレクト
+      await supabase.auth.signOut()
+      router.push('/')
+    } catch (error) {
+      console.error('Account deletion failed:', error)
+      setError(error instanceof Error ? error.message : 'アカウントの削除に失敗しました')
+      setIsDeleteDialogOpen(false)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -143,7 +181,7 @@ export default function ProfilePage() {
           <div className="flex items-start justify-between">
             <div className="flex items-center">
               <div className="w-20 h-20 bg-gray-300 rounded-full mr-6" />
-              <div>
+              <div className="flex-1">
                 <h1 className="text-2xl font-bold text-gray-900">{profile.display_name}</h1>
                 <p className="text-gray-600">@{profile.username}</p>
                 {profile.bio && <p className="mt-2 text-gray-700">{profile.bio}</p>}
@@ -170,6 +208,21 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
+            </div>
+            
+            {/* プロフィール設定ボタン */}
+            <div className="flex gap-2">
+              <Button variant="secondary" size="sm">
+                プロフィール編集
+              </Button>
+              <Button 
+                variant="danger" 
+                size="sm"
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+              >
+                アカウント削除
+              </Button>
             </div>
           </div>
 
@@ -241,6 +294,16 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+
+        {/* アカウント削除ダイアログ */}
+        <DeleteAccountDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          onConfirm={handleConfirmDeletion}
+          username={profile?.username || ''}
+          loading={isDeleting}
+          deletionPreview={deletionPreview}
+        />
       </div>
     </div>
   )
