@@ -17,8 +17,8 @@ const geistMono = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'エンジニアスキル向上アプリ',
-  description: 'システム設計スキルを実践的に学ぶWebアプリケーション',
+  title: 'ArchFlow',
+  description: 'システム設計スキルを実践的に学ぶWebアプリケーション - エンジニアのための設計スキル向上プラットフォーム',
 }
 
 export default function RootLayout({

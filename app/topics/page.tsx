@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Topic } from '@/lib/types'
+import { PageLoading } from '@/components/ui/Loading'
 
 const DIFFICULTY_LABELS = {
   1: '初級',
@@ -101,32 +102,28 @@ export default function TopicsPage() {
   }, [fetchTopics])
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-lg">読み込み中...</div>
-      </div>
-    )
+    return <PageLoading text="お題を読み込み中..." />
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-night-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">システム設計のお題</h1>
-          <p className="mt-2 text-gray-600">実践的なシステム設計スキルを身につけましょう</p>
+          <h1 className="text-3xl font-bold text-white">システム設計のお題</h1>
+          <p className="mt-2 text-night-300">実践的なシステム設計スキルを身につけましょう</p>
         </div>
 
         {/* フィルター */}
         <div className="mb-8 flex flex-wrap gap-4">
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="category" className="block text-sm font-medium text-white mb-1">
               カテゴリ
             </label>
             <select
               id="category"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full px-3 py-2 border border-night-700 bg-night-900 text-white rounded-md shadow-sm focus:outline-none focus:ring-dark-purple-500 focus:border-dark-purple-500"
             >
               <option value="all">すべて</option>
               <option value="SaaS">SaaS</option>
@@ -143,14 +140,14 @@ export default function TopicsPage() {
           </div>
 
           <div>
-            <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="difficulty" className="block text-sm font-medium text-white mb-1">
               難易度
             </label>
             <select
               id="difficulty"
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full px-3 py-2 border border-night-700 bg-night-900 text-white rounded-md shadow-sm focus:outline-none focus:ring-dark-purple-500 focus:border-dark-purple-500"
             >
               <option value="all">すべて</option>
               <option value="1">初級</option>
@@ -167,11 +164,11 @@ export default function TopicsPage() {
           {topics.map((topic) => (
             <div
               key={topic.id}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
+              className="bg-night-900 border border-night-800 rounded-lg shadow-md hover:shadow-lg hover:shadow-dark-purple-500/20 hover:scale-105 hover:border-dark-purple-600 transition-all duration-300 ease-in-out motion-reduce:hover:scale-100 motion-reduce:transition-none cursor-pointer group"
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900">{topic.title}</h3>
+                  <h3 className="text-xl font-semibold text-white group-hover:text-dark-purple-300 transition-colors duration-300">{topic.title}</h3>
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       DIFFICULTY_COLORS[topic.difficulty_level as keyof typeof DIFFICULTY_COLORS]
@@ -181,22 +178,22 @@ export default function TopicsPage() {
                   </span>
                 </div>
 
-                <p className="text-gray-600 mb-4 line-clamp-3">{topic.description}</p>
+                <p className="text-night-300 mb-4 line-clamp-3">{topic.description}</p>
 
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                <div className="flex items-center justify-between text-sm text-night-400 mb-4">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-night-800 text-night-200">
                     {topic.category}
                   </span>
                   <span>目安時間: {topic.estimated_time}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-night-400">
                     {topic.submission_count || 0}件の投稿
                   </span>
                   <Link
                     href={`/topics/${topic.id}`}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-dark-purple-600 hover:bg-dark-purple-700 group-hover:bg-dark-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-dark-purple-500 focus:ring-offset-night-900 transition-colors duration-300"
                   >
                     詳細を見る
                   </Link>
@@ -208,7 +205,7 @@ export default function TopicsPage() {
 
         {topics.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">該当するお題がありません</p>
+            <p className="text-night-400">該当するお題がありません</p>
           </div>
         )}
       </div>
