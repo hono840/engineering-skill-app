@@ -151,7 +151,7 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
                 placeholder="例: マイクロサービス型ECサイト設計"
               />
             </div>
@@ -168,7 +168,7 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
                 placeholder="設計の概要を説明してください"
               />
             </div>
@@ -185,7 +185,7 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
                 value={technicalReasoning}
                 onChange={(e) => setTechnicalReasoning(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
                 placeholder="なぜこの技術・アーキテクチャを選んだか"
               />
             </div>
@@ -202,7 +202,7 @@ export default function DesignEditor({ topic }: DesignEditorProps) {
                 value={challengesAndSolutions}
                 onChange={(e) => setChallengesAndSolutions(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
                 placeholder="想定される課題とその解決策"
               />
             </div>
