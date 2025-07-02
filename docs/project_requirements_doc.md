@@ -102,6 +102,45 @@ engineering-skill-app/
 }
 ```
 
+### 環境変数設定
+
+アプリケーションの動作に必要な環境変数一覧：
+
+#### 必須環境変数
+```env
+# Supabase 基本設定
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+
+# Supabase 管理者権限（アカウント削除等のサーバーサイド処理用）
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+```
+
+#### 環境変数の取得方法
+
+1. **Supabaseダッシュボードにアクセス**
+   - [https://supabase.com](https://supabase.com) にログイン
+   - プロジェクトを選択
+
+2. **API Keys の取得**
+   - Settings → API
+   - **Project URL**: `NEXT_PUBLIC_SUPABASE_URL` に設定
+   - **anon public**: `NEXT_PUBLIC_SUPABASE_ANON_KEY` に設定
+   - **service_role**: `SUPABASE_SERVICE_ROLE_KEY` に設定
+
+3. **ローカル環境での設定**
+   ```bash
+   # プロジェクトルートに .env.local ファイルを作成
+   cp .env.example .env.local
+   # 上記の環境変数を設定
+   ```
+
+#### セキュリティ注意事項
+
+- **Service Role Key**: 管理者権限を持つため、**絶対にクライアントサイドで使用しない**
+- **Service Role Key**: `.env.local` に保存し、GitHubにコミットしない
+- **本番環境**: VercelやNetlifyの環境変数設定で管理
+
 ## MVP機能仕様（現在検討中）
 
 ### メインユーザー
