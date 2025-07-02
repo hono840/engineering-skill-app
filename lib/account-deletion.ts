@@ -7,85 +7,56 @@ interface AccountDeletionErrorInterface {
 }
 
 /**
- * ユーザーのパスワードを検証する
+ * アカウント削除APIを呼び出してユーザーアカウントを削除する
  */
-export async function verifyPassword(email: string, password: string): Promise<boolean> {
+export async function deleteUserAccount(email: string, password: string): Promise<void> {
   try {
-    // 一時的なサインインでパスワードを検証
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const response = await fetch('/api/account/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
     })
 
-    if (error) {
-      // 認証エラーの詳細をログに記録
-      if (error.message === 'Invalid login credentials') {
-        throw new AccountDeletionErrorClass({
-          message: 'パスワードが正しくありません',
-          code: 'INVALID_CREDENTIALS',
-        })
-      }
+    const data = await response.json()
+
+    if (!response.ok) {
       throw new AccountDeletionErrorClass({
-        message: 'パスワードの検証に失敗しました',
-        code: 'VERIFICATION_FAILED',
-        details: error.message,
+        message: data.error || 'アカウントの削除に失敗しました',
+        code: 'DELETION_FAILED',
       })
     }
 
-    return true
+    if (!data.success) {
+      throw new AccountDeletionErrorClass({
+        message: 'アカウントの削除に失敗しました',
+        code: 'DELETION_FAILED',
+      })
+    }
   } catch (error) {
     if (error instanceof AccountDeletionErrorClass) {
       throw error
     }
-    console.error('Password verification error:', error)
+    console.error('Account deletion error:', error)
     throw new AccountDeletionErrorClass({
-      message: 'パスワードの検証でエラーが発生しました',
-      code: 'VERIFICATION_ERROR',
+      message: 'アカウント削除処理でエラーが発生しました',
+      code: 'DELETION_ERROR',
     })
   }
 }
 
-/**
- * ユーザーアカウントと関連データを削除する
- * データベースのCASCADE設定により、関連データは自動的に削除される
- */
-export async function deleteUserAccount(userId: string): Promise<void> {
-  try {
-    // Supabase Authからユーザーを削除
-    // これにより、データベースのCASCADE設定で関連するprofilesレコードと
-    // その関連データ（submissions, feedbacks, submission_likes）も自動削除される
-    const { error: authError } = await supabase.auth.admin.deleteUser(userId)
-    
-    if (authError) {
-      throw new AccountDeletionErrorClass({
-        message: 'アカウントの削除に失敗しました',
-        code: authError.message,
-        details: authError.message,
-      })
-    }
-
-    // 成功時のログ出力
-    console.log(`User account ${userId} has been successfully deleted`)
-  } catch (error) {
-    console.error('Account deletion failed:', error)
-    throw error
-  }
-}
 
 /**
  * アカウント削除の完全なフロー
  */
 export async function performAccountDeletion(
   email: string,
-  password: string,
-  userId: string
+  password: string
 ): Promise<void> {
   try {
-    // 1. パスワード検証
-    await verifyPassword(email, password)
-
-    // 2. アカウント削除実行
-    await deleteUserAccount(userId)
+    // アカウント削除実行（パスワード検証も含む）
+    await deleteUserAccount(email, password)
   } catch (error) {
     if (error instanceof AccountDeletionErrorClass) {
       throw error

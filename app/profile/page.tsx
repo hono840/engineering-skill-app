@@ -94,7 +94,7 @@ export default function ProfilePage() {
 
     try {
       setIsDeleting(true)
-      await performAccountDeletion(profile.email, password, user.id)
+      await performAccountDeletion(profile.email, password)
       
       // 削除成功後、ログアウトしてホームページにリダイレクト
       await supabase.auth.signOut()
